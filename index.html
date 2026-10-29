@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Minha carteira</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Minha carteira</h1>
+          <p class="sub" id="status">Carregando…</p>
+        </div>
+        <nav class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-t="cart">
+            Carteira
+          </button>
+          <button role="tab" aria-selected="false" data-t="idea">
+            Ideias de investimento
+          </button>
+        </nav>
+      </header>
+
+      <main id="cart">
+        <section class="card">
+          <div class="hl">
+            <span class="lbl">Valor atual da carteira</span
+            ><strong id="vTot">R$ 0,00</strong
+            ><span class="chip" id="vRes"></span>
+          </div>
+          <div class="bar" id="bar"></div>
+          <ul class="leg" id="leg"></ul>
+        </section>
+        <section class="stats" style="margin-bottom: 14px">
+          <div class="card">
+            <span class="lbl">Total investido</span><b id="sInv">—</b>
+          </div>
+          <div class="card">
+            <span class="lbl">Proventos recebidos</span><b id="sProv">—</b>
+          </div>
+          <div class="card">
+            <span class="lbl">Retorno com proventos</span><b id="sRet">—</b>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Importar da B3</h2>
+          <label class="drop" id="drop">
+            <input type="file" id="file" multiple accept=".xlsx,.xls,.csv" />
+            <b>Arraste os arquivos da B3 aqui</b> ou clique para escolher<br />
+            <span class="hint"
+              >Extrato de Posição (ações, FIIs, renda fixa, Tesouro) e, se
+              quiser o preço médio, o de Negociação. Aceita .xlsx e .csv.</span
+            >
+          </label>
+          <div class="row">
+            <label
+              ><input type="checkbox" id="impClean" /> Remover da carteira os
+              ativos brasileiros que não estão no arquivo</label
+            >
+          </div>
+          <p class="msg" id="impMsg" role="status"></p>
+        </section>
+
+        <section class="card">
+          <h2>Adicionar ativo manualmente</h2>
+          <div class="grid">
+            <label
+              >Ativo<input id="nT" placeholder="Ex.: ITUB4" autocomplete="off"
+            /></label>
+            <label>Tipo<select id="nC"></select></label>
+            <label
+              >Quantidade<input id="nQ" type="number" step="any" min="0"
+            /></label>
+            <label
+              >Preço médio<input id="nPm" type="number" step="any" min="0"
+            /></label>
+            <label
+              >Cotação atual<input
+                id="nPa"
+                type="number"
+                step="any"
+                min="0"
+                placeholder="Opcional"
+            /></label>
+            <label
+              >Proventos recebidos<input
+                id="nPv"
+                type="number"
+                step="any"
+                min="0"
+                placeholder="Opcional"
+            /></label>
+            <button class="pri" id="addBtn" type="button">
+              Adicionar ativo
+            </button>
+          </div>
+          <p class="err" id="addErr"></p>
+        </section>
+
+        <section class="card">
+          <h2>Posições</h2>
+          <p class="hint">
+            Edite qualquer campo direto na tabela, inclusive o tipo. Esta página
+            não busca cotações sozinha: atualize a cotação atual ou importe um
+            novo extrato. Valores em US$ usam o câmbio abaixo.
+          </p>
+          <label style="max-width: 220px; margin: 10px 0"
+            >Câmbio (R$ por US$)<input
+              id="fx"
+              type="number"
+              step="0.01"
+              min="0"
+          /></label>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Quantidade</th>
+                  <th>Preço médio</th>
+                  <th>Cotação atual</th>
+                  <th class="n">Valor (R$)</th>
+                  <th class="n">Resultado</th>
+                  <th>Proventos</th>
+                  <th class="n">% da carteira</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tb"></tbody>
+            </table>
+          </div>
+          <p class="empty" id="empty">
+            Nenhum ativo ainda. Importe um arquivo da B3 ou adicione
+            manualmente.
+          </p>
+          <div class="row">
+            <button class="ghost" id="bkExp" type="button">
+              Exportar backup (.json)
+            </button>
+            <label class="ghost" style="cursor: pointer"
+              >Restaurar backup<input
+                type="file"
+                id="bkImp"
+                accept=".json"
+                hidden
+            /></label>
+          </div>
+        </section>
+      </main>
+
+      <main id="idea" hidden>
+        <section class="card">
+          <h2>Pedir ideias ao Claude</h2>
+          <div class="gen">
+            <label>Categoria<select id="cat"></select></label>
+            <label
+              >Objetivo<select id="obj">
+                <option>Renda com dividendos</option>
+                <option>Crescimento do patrimônio</option>
+                <option>Equilibrado</option>
+              </select></label
+            >
+            <label
+              >Perfil de risco<select id="per">
+                <option>Conservador</option>
+                <option selected>Moderado</option>
+                <option>Arrojado</option>
+              </select></label
+            >
+          </div>
+          <button class="pri" id="cp" type="button">
+            Copiar pedido para o Claude
+          </button>
+          <p class="msg" id="cpMsg" role="status"></p>
+          <textarea
+            id="prompt"
+            hidden
+            readonly
+            aria-label="Pedido gerado"
+          ></textarea>
+          <p class="note">
+            O pedido já leva a composição da sua carteira. Cole no Claude, e
+            depois salve as ideias que gostar na lista abaixo. Ideias de IA não
+            têm cotações em tempo real nem são recomendação personalizada:
+            confirme dados e riscos em fontes oficiais ou com um assessor
+            registrado.
+          </p>
+          <details open>
+            <summary>O que avaliar antes de comprar</summary>
+            <ul id="crit"></ul>
+          </details>
+        </section>
+        <section class="card">
+          <h2>Lista de observação</h2>
+          <div class="wadd">
+            <label
+              >Ativo<input id="wT" placeholder="Ex.: VOO" autocomplete="off"
+            /></label>
+            <label>Nome (opcional)<input id="wN" /></label>
+            <button class="pri" id="wAdd" type="button">Salvar na lista</button>
+          </div>
+          <p class="hint">O tipo salvo é a categoria escolhida acima.</p>
+          <div id="watch"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+      window.XLSX ||
+        document.write('<script src="vendor/xlsx.full.min.js"><\/script>')
+    </script>
+    <script src="app.js"></script>
+  </body>
+</html>
